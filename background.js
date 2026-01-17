@@ -1,5 +1,3 @@
-/* ================== DEFAULT ================== */
-
 const DEFAULT_SETTINGS = {
   country: "Turkey",
   region: "Ankara",
@@ -8,8 +6,6 @@ const DEFAULT_SETTINGS = {
   timezoneOffset: 180,
   calculationMethod: "Turkey"
 };
-
-/* ================== STORAGE ================== */
 
 async function getSettings() {
   const { settings } = await browser.storage.local.get("settings");
@@ -24,14 +20,9 @@ function getRemainingMinutes(vakitler) {
       return Math.ceil((d - now) / 60000);
     }
   }
-
-  // Yatsı sonrası → yarın imsak
   const next = toDate(vakitler[0].time, 1);
   return Math.ceil((next - now) / 60000);
 }
-
-
-/* ================== API ================== */
 
 function buildApi(settings, date) {
   return (
@@ -77,8 +68,6 @@ async function fetchVakitler() {
   return list;
 }
 
-/* ================== PROGRESS ================== */
-
 function toDate(time, offset = 0) {
   const [h, m] = time.split(":").map(Number);
   const d = new Date();
@@ -117,20 +106,17 @@ function drawIcon(progress) {
   const center = size / 2;
   const radius = size / 2 - 2;
 
-  // ---------- Dış kenar çizgisi ----------
   ctx.beginPath();
   ctx.arc(center, center, radius, 0, Math.PI * 2);
   ctx.strokeStyle = "#888"; // ince, minimalist gri
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // ---------- Arka plan dolgu ----------
   ctx.beginPath();
   ctx.arc(center, center, radius, 0, Math.PI * 2);
   ctx.fillStyle = "rgba(200, 200, 200, 0)"; // hafif gri, şeffaf
   ctx.fill();
 
-  // ---------- Dolan kısım ----------
   const startAngle = -Math.PI / 2;
   const endAngle = startAngle + progress * 2 * Math.PI;
 
@@ -138,7 +124,7 @@ function drawIcon(progress) {
   ctx.moveTo(center, center);
   ctx.arc(center, center, radius, startAngle, endAngle);
   ctx.closePath();
-  ctx.fillStyle = "rgba(120,120,120,0.6)"; // minimalist gri dolgu
+  ctx.fillStyle = "rgba(120,120,120,0.6)";
   ctx.fill();
 
   return ctx.getImageData(0, 0, size, size);
@@ -150,11 +136,11 @@ async function updateIcon() {
   const remainingMs = getRemainingMinutes(vakitler) * 60000;
   const tooltip = formatTooltip(remainingMs);
 
-  await browser.browserAction.setIcon({
+  await browser.action.setIcon({
     imageData: drawIcon(progress)
   });
 
-  await browser.browserAction.setTitle({
+  await browser.action.setTitle({
     title: tooltip
   });
 }
@@ -169,9 +155,6 @@ function formatTooltip(ms) {
     ? `${h} saat ${m} dk kaldı`
     : `${m} dk kaldı`;
 }
-
-
-/* ================== EVENTS ================== */
 
 browser.runtime.onInstalled.addListener(() => {
   browser.alarms.create("tick", { periodInMinutes: 1 });

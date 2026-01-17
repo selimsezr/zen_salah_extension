@@ -1,17 +1,27 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Vakit Takibi",
   "version": "1.0",
-  "background": {
-    "scripts": ["background.js"],
-    "persistent": false
-  },
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html"
+  },
+  "background": {
+    "scripts": ["background.js"]
   },
   "permissions": [
     "storage",
-    "alarms",
+    "alarms"
+  ],
+  "host_permissions": [
     "https://vakit.vercel.app/*"
-  ]
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "vakit-takibi@extension.id",
+      "strict_min_version": "115.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
 }

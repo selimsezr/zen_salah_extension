@@ -35,8 +35,6 @@ async function loadCities(c, r) {
   data.forEach((x) => city.add(new Option(x, x)));
 }
 
-/* ================== INIT ================== */
-
 async function init() {
   await loadCountries();
 
@@ -81,8 +79,6 @@ const nextName = document.getElementById("next-name");
 const nextTime = document.getElementById("next-time");
 const remaining = document.getElementById("remaining");
 
-/* ================== HELPERS ================== */
-
 function toDate(time, offset = 0) {
   const [h, m] = time.split(":").map(Number);
   const d = new Date();
@@ -101,7 +97,6 @@ function formatRemaining(ms) {
   return `${m} dk`;
 }
 
-/* ================== MAIN ================== */
 
 async function loadNextVakit() {
   const { vakitler } = await browser.storage.local.get("vakitler");
@@ -120,7 +115,6 @@ async function loadNextVakit() {
     }
   }
 
-  // Yatsı sonrası → yarın imsak
   if (!next) {
     next = vakitler[0];
     nextDate = toDate(next.time, 1);
@@ -209,8 +203,5 @@ async function loadNext() {
 }
 
 loadNext();
-
-
 loadNextVakit();
-
 init();
