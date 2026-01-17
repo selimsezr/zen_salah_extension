@@ -1,0 +1,194 @@
+/* ================== DEFAULT ================== */
+
+const DEFAULT_SETTINGS = {
+  country: "Turkey",
+  region: "Ankara",
+  city: "Ankara",
+  days: 1,
+  timezoneOffset: 180,
+  calculationMethod: "Turkey"
+};
+
+/* ================== STORAGE ================== */
+
+async function getSettings() {
+  const { settings } = await browser.storage.local.get("settings");
+  return { ...DEFAULT_SETTINGS, ...settings };
+}
+function getRemainingMinutes(vakitler) {
+  const now = new Date();
+
+  for (let i = 0; i < vakitler.length; i++) {
+    const d = toDate(vakitler[i].time);
+    if (now < d) {
+      return Math.ceil((d - now) / 60000);
+    }
+  }
+
+  // Yatsı sonrası → yarın imsak
+  const next = toDate(vakitler[0].time, 1);
+  return Math.ceil((next - now) / 60000);
+}
+
+
+/* ================== API ================== */
+
+function buildApi(settings, date) {
+  return (
+    "https://vakit.vercel.app/api/timesFromPlace" +
+    `?country=${encodeURIComponent(settings.country)}` +
+    `&region=${encodeURIComponent(settings.region)}` +
+    `&city=${encodeURIComponent(settings.city)}` +
+    `&date=${date}` +
+    `&days=${settings.days}` +
+    `&timezoneOffset=${settings.timezoneOffset}` +
+    `&calculationMethod=${settings.calculationMethod}`
+  );
+}
+
+async function fetchVakitler() {
+  const today = new Date().toISOString().split("T")[0];
+  const { vakitler, vakitDate } = await browser.storage.local.get([
+    "vakitler",
+    "vakitDate"
+  ]);
+
+  if (vakitler && vakitDate === today) return vakitler;
+
+  const settings = await getSettings();
+  const res = await fetch(buildApi(settings, today));
+  const data = await res.json();
+
+  const t = data.times[today];
+
+  const list = [
+    { name: "İmsak", time: t[0] },
+    { name: "Öğle", time: t[2] },
+    { name: "İkindi", time: t[3] },
+    { name: "Akşam", time: t[4] },
+    { name: "Yatsı", time: t[5] }
+  ];
+
+  await browser.storage.local.set({
+    vakitler: list,
+    vakitDate: today
+  });
+
+  return list;
+}
+
+/* ================== PROGRESS ================== */
+
+function toDate(time, offset = 0) {
+  const [h, m] = time.split(":").map(Number);
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  d.setHours(h, m, 0, 0);
+  return d;
+}
+
+function getNextProgress(vakitler) {
+  const now = new Date();
+
+  for (let i = 0; i < vakitler.length; i++) {
+    const next = toDate(vakitler[i].time);
+    if (now < next) {
+      const prev =
+        i === 0
+          ? toDate(vakitler.at(-1).time, -1)
+          : toDate(vakitler[i - 1].time);
+
+      return (now - prev) / (next - prev);
+    }
+  }
+
+  const prev = toDate(vakitler.at(-1).time);
+  const next = toDate(vakitler[0].time, 1);
+  return (now - prev) / (next - prev);
+}
+
+function drawIcon(progress) {
+  const size = 30;
+  const canvas = new OffscreenCanvas(size, size);
+  const ctx = canvas.getContext("2d");
+
+  ctx.clearRect(0, 0, size, size);
+
+  const center = size / 2;
+  const radius = size / 2 - 2;
+
+  // ---------- Dış kenar çizgisi ----------
+  ctx.beginPath();
+  ctx.arc(center, center, radius, 0, Math.PI * 2);
+  ctx.strokeStyle = "#888"; // ince, minimalist gri
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // ---------- Arka plan dolgu ----------
+  ctx.beginPath();
+  ctx.arc(center, center, radius, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(200, 200, 200, 0)"; // hafif gri, şeffaf
+  ctx.fill();
+
+  // ---------- Dolan kısım ----------
+  const startAngle = -Math.PI / 2;
+  const endAngle = startAngle + progress * 2 * Math.PI;
+
+  ctx.beginPath();
+  ctx.moveTo(center, center);
+  ctx.arc(center, center, radius, startAngle, endAngle);
+  ctx.closePath();
+  ctx.fillStyle = "rgba(120,120,120,0.6)"; // minimalist gri dolgu
+  ctx.fill();
+
+  return ctx.getImageData(0, 0, size, size);
+}
+
+async function updateIcon() {
+  const vakitler = await fetchVakitler();
+  const progress = getNextProgress(vakitler);
+  const remainingMs = getRemainingMinutes(vakitler) * 60000;
+  const tooltip = formatTooltip(remainingMs);
+
+  await browser.browserAction.setIcon({
+    imageData: drawIcon(progress)
+  });
+
+  await browser.browserAction.setTitle({
+    title: tooltip
+  });
+}
+
+
+function formatTooltip(ms) {
+  const totalMin = Math.ceil(ms / 60000);
+  const h = Math.floor(totalMin / 60);
+  const m = totalMin % 60;
+
+  return h > 0
+    ? `${h} saat ${m} dk kaldı`
+    : `${m} dk kaldı`;
+}
+
+
+/* ================== EVENTS ================== */
+
+browser.runtime.onInstalled.addListener(() => {
+  browser.alarms.create("tick", { periodInMinutes: 1 });
+  updateIcon();
+});
+
+browser.runtime.onStartup.addListener(() => {
+  browser.alarms.create("tick", { periodInMinutes: 1 });
+  updateIcon();
+});
+
+
+browser.alarms.onAlarm.addListener((a) => {
+  if (a.name === "tick") updateIcon();
+});
+browser.runtime.onMessage.addListener((msg) => {
+  if (msg.type === "UPDATE") {
+    updateIcon();
+  }
+});
