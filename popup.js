@@ -1,3 +1,5 @@
+const API_BASE = "https://prayertimes.api.abdus.dev/api/diyanet";
+
 const country = document.getElementById("country");
 const region = document.getElementById("region");
 const city = document.getElementById("city");
@@ -6,19 +8,19 @@ const canvas = document.getElementById("icon");
 const ctx = canvas.getContext("2d");
 
 async function loadCountries() {
-  const res = await fetch("https://vakit.vercel.app/api/countries");
+  const res = await fetch(`${API_BASE}/countries`);
   const data = await res.json();
 
   country.innerHTML = "";
   data.forEach((c) => {
-    country.add(new Option(c.name, c.name));
+    country.add(new Option(c, c));
   });
 }
 
 async function loadRegions(c) {
   region.innerHTML = "";
   const res = await fetch(
-    `https://vakit.vercel.app/api/regions?country=${encodeURIComponent(c)}`
+    `${API_BASE}/countries/${encodeURIComponent(c)}/cities`
   );
   const data = await res.json();
   data.forEach((r) => region.add(new Option(r, r)));
@@ -27,12 +29,12 @@ async function loadRegions(c) {
 async function loadCities(c, r) {
   city.innerHTML = "";
   const res = await fetch(
-    `https://vakit.vercel.app/api/cities?country=${encodeURIComponent(
+    `${API_BASE}/locations?country=${encodeURIComponent(
       c
-    )}&region=${encodeURIComponent(r)}`
+    )}&city=${encodeURIComponent(r)}`
   );
   const data = await res.json();
-  data.forEach((x) => city.add(new Option(x, x)));
+  data.forEach((x) => city.add(new Option(x.region, x.id)));
 }
 
 async function init() {
@@ -40,11 +42,23 @@ async function init() {
 
   const { settings } = await browser.storage.local.get("settings");
   if (settings) {
-    country.value = settings.country;
-    await loadRegions(settings.country);
-    region.value = settings.region;
-    await loadCities(settings.country, settings.region);
-    city.value = settings.city;
+    const savedCountry =
+      settings.country === "Turkey" ? "TÜRKİYE" : settings.country;
+    country.value = savedCountry;
+    await loadRegions(savedCountry);
+    region.value = settings.region.toUpperCase();
+    await loadCities(savedCountry, settings.region.toUpperCase());
+    if (settings.locationId) {
+      city.value = settings.locationId;
+    } else {
+      const target = settings.city.toUpperCase();
+      for (const opt of city.options) {
+        if (opt.text === target) {
+          city.value = opt.value;
+          break;
+        }
+      }
+    }
   } else {
     await loadRegions(country.value);
     await loadCities(country.value, region.value);
@@ -65,10 +79,8 @@ save.onclick = async () => {
     settings: {
       country: country.value,
       region: region.value,
-      city: city.value,
-      days: 1,
-      timezoneOffset: 180,
-      calculationMethod: "Turkey",
+      city: city.options[city.selectedIndex].text,
+      locationId: Number(city.value),
     },
   });
 

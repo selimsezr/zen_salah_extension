@@ -1,10 +1,10 @@
+const API_BASE = "https://prayertimes.api.abdus.dev/api/diyanet";
+
 const DEFAULT_SETTINGS = {
-  country: "Turkey",
-  region: "Ankara",
-  city: "Ankara",
-  days: 1,
-  timezoneOffset: 180,
-  calculationMethod: "Turkey"
+  country: "TÜRKİYE",
+  region: "ANKARA",
+  city: "ANKARA",
+  locationId: 9206
 };
 
 async function getSettings() {
@@ -24,17 +24,32 @@ function getRemainingMinutes(vakitler) {
   return Math.ceil((next - now) / 60000);
 }
 
-function buildApi(settings, date) {
-  return (
-    "https://vakit.vercel.app/api/timesFromPlace" +
-    `?country=${encodeURIComponent(settings.country)}` +
-    `&region=${encodeURIComponent(settings.region)}` +
-    `&city=${encodeURIComponent(settings.city)}` +
-    `&date=${date}` +
-    `&days=${settings.days}` +
-    `&timezoneOffset=${settings.timezoneOffset}` +
-    `&calculationMethod=${settings.calculationMethod}`
+async function resolveLocationId(settings) {
+  if (settings.locationId) return settings.locationId;
+
+  const country =
+    settings.country === "Turkey" ? "TÜRKİYE" : settings.country;
+  const province = settings.region.toUpperCase();
+  const res = await fetch(
+    `${API_BASE}/locations?country=${encodeURIComponent(country)}&city=${encodeURIComponent(province)}`
   );
+  const locations = await res.json();
+  const target = settings.city.toUpperCase();
+  const match = locations.find((l) => l.region === target);
+
+  if (match) {
+    const updated = {
+      ...settings,
+      country,
+      region: province,
+      city: match.region,
+      locationId: match.id
+    };
+    await browser.storage.local.set({ settings: updated });
+    return match.id;
+  }
+
+  return DEFAULT_SETTINGS.locationId;
 }
 
 async function fetchVakitler() {
@@ -47,17 +62,21 @@ async function fetchVakitler() {
   if (vakitler && vakitDate === today) return vakitler;
 
   const settings = await getSettings();
-  const res = await fetch(buildApi(settings, today));
+  const locationId = await resolveLocationId(settings);
+  const res = await fetch(`${API_BASE}/prayertimes?location_id=${locationId}`);
   const data = await res.json();
 
-  const t = data.times[today];
+  const todayData = data.find((d) => d.date.startsWith(today));
+  if (!todayData) {
+    throw new Error("Bugün için namaz vakti bulunamadı");
+  }
 
   const list = [
-    { name: "İmsak", time: t[0] },
-    { name: "Öğle", time: t[2] },
-    { name: "İkindi", time: t[3] },
-    { name: "Akşam", time: t[4] },
-    { name: "Yatsı", time: t[5] }
+    { name: "İmsak", time: todayData.fajr },
+    { name: "Öğle", time: todayData.dhuhr },
+    { name: "İkindi", time: todayData.asr },
+    { name: "Akşam", time: todayData.maghrib },
+    { name: "Yatsı", time: todayData.isha }
   ];
 
   await browser.storage.local.set({

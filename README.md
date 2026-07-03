@@ -19,7 +19,7 @@ Eklenti, arka planda sürekli çalışır ve dakika bazında otomatik olarak gü
 
 ## 🧠 Nasıl Çalışır?
 
-- Namaz vakitleri `vakit.vercel.app` API’sinden alınır
+- Namaz vakitleri `prayertimes.api.abdus.dev` API’sinden alınır (Diyanet verisi)
 - Günlük vakitler local storage’da saklanır
 - Firefox `alarms` API ile her dakika güncellenir
 - Kalan süreye göre ikon içindeki doluluk oranı hesaplanır
