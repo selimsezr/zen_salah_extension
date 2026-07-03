@@ -60,8 +60,11 @@ async function init() {
       }
     }
   } else {
+    country.value = "TÜRKİYE";
     await loadRegions(country.value);
+    region.value = "ANKARA";
     await loadCities(country.value, region.value);
+    city.value = 9206;
   }
 }
 
@@ -75,16 +78,21 @@ region.onchange = async () => {
 };
 
 save.onclick = async () => {
+  const locationId = Number(city.value);
+  if (!locationId) return;
+
   await browser.storage.local.set({
     settings: {
       country: country.value,
       region: region.value,
       city: city.options[city.selectedIndex].text,
-      locationId: Number(city.value),
+      locationId,
     },
   });
 
   await browser.storage.local.remove(["vakitler", "vakitDate"]);
+  await browser.runtime.sendMessage({ type: "GET_VAKITLER" });
+  await browser.runtime.sendMessage({ type: "UPDATE" });
   window.close();
 };
 const nextName = document.getElementById("next-name");
@@ -192,13 +200,10 @@ function formatRemaining(ms) {
   return h > 0 ? `${h} saat ${m} dk` : `${m} dk`;
 }
 async function loadNext() {
-  const bg = browser.runtime.getBackgroundPage
-    ? await browser.runtime.getBackgroundPage()
-    : null;
+  const response = await browser.runtime.sendMessage({ type: "GET_VAKITLER" });
+  if (!response?.vakitler?.length) return;
 
-  if (!bg) return;
-
-  const vakitler = await bg.fetchVakitler();
+  const { vakitler, progress } = response;
   const next = getNextVakit(vakitler);
 
   document.getElementById("next-name").textContent = next.name;
@@ -208,9 +213,7 @@ async function loadNext() {
   document.getElementById("remaining").textContent =
     formatRemaining(remainingMs);
 
-  const progress = bg.getNextProgress(vakitler);
   const minutes = Math.ceil(remainingMs / 60000);
-
   drawBigIcon(progress, minutes);
 }
 

@@ -7,6 +7,14 @@ const DEFAULT_SETTINGS = {
   locationId: 9206
 };
 
+function localToday() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 async function getSettings() {
   const { settings } = await browser.storage.local.get("settings");
   return { ...DEFAULT_SETTINGS, ...settings };
@@ -53,7 +61,7 @@ async function resolveLocationId(settings) {
 }
 
 async function fetchVakitler() {
-  const today = new Date().toISOString().split("T")[0];
+  const today = localToday();
   const { vakitler, vakitDate } = await browser.storage.local.get([
     "vakitler",
     "vakitDate"
@@ -150,18 +158,22 @@ function drawIcon(progress) {
 }
 
 async function updateIcon() {
-  const vakitler = await fetchVakitler();
-  const progress = getNextProgress(vakitler);
-  const remainingMs = getRemainingMinutes(vakitler) * 60000;
-  const tooltip = formatTooltip(remainingMs);
+  try {
+    const vakitler = await fetchVakitler();
+    const progress = getNextProgress(vakitler);
+    const remainingMs = getRemainingMinutes(vakitler) * 60000;
+    const tooltip = formatTooltip(remainingMs);
 
-  await browser.action.setIcon({
-    imageData: drawIcon(progress)
-  });
+    await browser.action.setIcon({
+      imageData: drawIcon(progress)
+    });
 
-  await browser.action.setTitle({
-    title: tooltip
-  });
+    await browser.action.setTitle({
+      title: tooltip
+    });
+  } catch (err) {
+    console.error("Vakit güncellenemedi:", err);
+  }
 }
 
 
@@ -189,8 +201,23 @@ browser.runtime.onStartup.addListener(() => {
 browser.alarms.onAlarm.addListener((a) => {
   if (a.name === "tick") updateIcon();
 });
-browser.runtime.onMessage.addListener((msg) => {
+browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.type === "UPDATE") {
     updateIcon();
+    return;
+  }
+
+  if (msg.type === "GET_VAKITLER") {
+    fetchVakitler()
+      .then((vakitler) => {
+        sendResponse({
+          vakitler,
+          progress: getNextProgress(vakitler)
+        });
+      })
+      .catch((err) => {
+        sendResponse({ error: err.message });
+      });
+    return true;
   }
 });
