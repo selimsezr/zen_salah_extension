@@ -1,8 +1,10 @@
-# 🕌 Vakit Takibi – Firefox Eklentisi
+# 🕌 Vakit Takibi – Firefox / Zen Browser Eklentisi
 
-**Vakit Takibi**, bulunduğunuz konuma göre namaz vakitlerini takip eden ve bir sonraki vakte kalan süreyi tarayıcı araç çubuğunda görsel olarak gösteren hafif ve modern bir Firefox eklentisidir.
+**Vakit Takibi**, bulunduğunuz konuma göre namaz vakitlerini takip eden ve bir sonraki vakte kalan süreyi tarayıcı araç çubuğunda görsel olarak gösteren hafif ve modern bir eklentidir.
 
 Eklenti, arka planda sürekli çalışır ve dakika bazında otomatik olarak güncellenir.
+
+English documentation: [README.en.md](README.en.md)
 
 ---
 
@@ -14,6 +16,7 @@ Eklenti, arka planda sürekli çalışır ve dakika bazında otomatik olarak gü
 - 🌍 Ülke / şehir / bölge bazlı hesaplama
 - 💾 Günlük vakitleri cache’leyerek performanslı çalışma
 - 💤 Popup açılmadan da arka planda çalışır
+- 🌐 Türkçe ve İngilizce arayüz (tarayıcı diline göre)
 
 ---
 

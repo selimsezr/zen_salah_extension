@@ -1,0 +1,112 @@
+{
+  "extensionName": {
+    "message": "Prayer Times"
+  },
+  "extensionDescription": {
+    "message": "Track Islamic prayer times and show the next salah countdown in the toolbar."
+  },
+  "save": {
+    "message": "Save"
+  },
+  "nextPrayerLabel": {
+    "message": "Next prayer: $PRAYER$",
+    "placeholders": {
+      "prayer": {
+        "content": "$1",
+        "example": "Dhuhr"
+      }
+    }
+  },
+  "timeLabel": {
+    "message": "Time: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "12:58"
+      }
+    }
+  },
+  "remainingLabel": {
+    "message": "Remaining: $DURATION$",
+    "placeholders": {
+      "duration": {
+        "content": "$1",
+        "example": "2 h 30 min"
+      }
+    }
+  },
+  "prayer_fajr": {
+    "message": "Fajr"
+  },
+  "prayer_dhuhr": {
+    "message": "Dhuhr"
+  },
+  "prayer_asr": {
+    "message": "Asr"
+  },
+  "prayer_maghrib": {
+    "message": "Maghrib"
+  },
+  "prayer_isha": {
+    "message": "Isha"
+  },
+  "durationHoursMinutes": {
+    "message": "$HOURS$ h $MINUTES$ min",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "2"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "durationHours": {
+    "message": "$HOURS$ h",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "durationMinutes": {
+    "message": "$MINUTES$ min",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "30"
+      }
+    }
+  },
+  "tooltipHoursMinutes": {
+    "message": "$HOURS$ h $MINUTES$ min left",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "2"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "tooltipMinutes": {
+    "message": "$MINUTES$ min left",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "30"
+      }
+    }
+  },
+  "errorNoPrayerTimes": {
+    "message": "No prayer times found for today"
+  },
+  "errorUpdateFailed": {
+    "message": "Failed to update prayer times"
+  }
+}

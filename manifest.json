@@ -1,12 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "Vakit Takibi",
-  "version": "1.0",
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "version": "1.1.0",
+  "default_locale": "en",
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "popup.html",
+    "default_title": "__MSG_extensionName__"
   },
   "background": {
-    "scripts": ["background.js"]
+    "scripts": ["i18n.js", "background.js"]
   },
   "permissions": [
     "storage",

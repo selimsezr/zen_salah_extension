@@ -76,15 +76,15 @@ async function fetchVakitler() {
 
   const todayData = data.find((d) => d.date.startsWith(today));
   if (!todayData) {
-    throw new Error("Bugün için namaz vakti bulunamadı");
+    throw new Error(browser.i18n.getMessage("errorNoPrayerTimes"));
   }
 
   const list = [
-    { name: "İmsak", time: todayData.fajr },
-    { name: "Öğle", time: todayData.dhuhr },
-    { name: "İkindi", time: todayData.asr },
-    { name: "Akşam", time: todayData.maghrib },
-    { name: "Yatsı", time: todayData.isha }
+    { name: "fajr", time: todayData.fajr },
+    { name: "dhuhr", time: todayData.dhuhr },
+    { name: "asr", time: todayData.asr },
+    { name: "maghrib", time: todayData.maghrib },
+    { name: "isha", time: todayData.isha }
   ];
 
   await browser.storage.local.set({
@@ -172,19 +172,8 @@ async function updateIcon() {
       title: tooltip
     });
   } catch (err) {
-    console.error("Vakit güncellenemedi:", err);
+    console.error(browser.i18n.getMessage("errorUpdateFailed"), err);
   }
-}
-
-
-function formatTooltip(ms) {
-  const totalMin = Math.ceil(ms / 60000);
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-
-  return h > 0
-    ? `${h} saat ${m} dk kaldı`
-    : `${m} dk kaldı`;
 }
 
 browser.runtime.onInstalled.addListener(() => {

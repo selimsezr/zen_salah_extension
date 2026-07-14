@@ -1,0 +1,112 @@
+{
+  "extensionName": {
+    "message": "Vakit Takibi"
+  },
+  "extensionDescription": {
+    "message": "Namaz vakitlerini takip edin ve bir sonraki vakte kalan süreyi araç çubuğunda görün."
+  },
+  "save": {
+    "message": "Kaydet"
+  },
+  "nextPrayerLabel": {
+    "message": "Sonraki vakit: $PRAYER$",
+    "placeholders": {
+      "prayer": {
+        "content": "$1",
+        "example": "Öğle"
+      }
+    }
+  },
+  "timeLabel": {
+    "message": "Saat: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "12:58"
+      }
+    }
+  },
+  "remainingLabel": {
+    "message": "Kalan süre: $DURATION$",
+    "placeholders": {
+      "duration": {
+        "content": "$1",
+        "example": "2 saat 30 dk"
+      }
+    }
+  },
+  "prayer_fajr": {
+    "message": "İmsak"
+  },
+  "prayer_dhuhr": {
+    "message": "Öğle"
+  },
+  "prayer_asr": {
+    "message": "İkindi"
+  },
+  "prayer_maghrib": {
+    "message": "Akşam"
+  },
+  "prayer_isha": {
+    "message": "Yatsı"
+  },
+  "durationHoursMinutes": {
+    "message": "$HOURS$ saat $MINUTES$ dk",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "2"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "durationHours": {
+    "message": "$HOURS$ saat",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
+  "durationMinutes": {
+    "message": "$MINUTES$ dk",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "30"
+      }
+    }
+  },
+  "tooltipHoursMinutes": {
+    "message": "$HOURS$ saat $MINUTES$ dk kaldı",
+    "placeholders": {
+      "hours": {
+        "content": "$1",
+        "example": "2"
+      },
+      "minutes": {
+        "content": "$2",
+        "example": "30"
+      }
+    }
+  },
+  "tooltipMinutes": {
+    "message": "$MINUTES$ dk kaldı",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "30"
+      }
+    }
+  },
+  "errorNoPrayerTimes": {
+    "message": "Bugün için namaz vakti bulunamadı"
+  },
+  "errorUpdateFailed": {
+    "message": "Vakit güncellenemedi"
+  }
+}

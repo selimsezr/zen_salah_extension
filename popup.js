@@ -38,6 +38,7 @@ async function loadCities(c, r) {
 }
 
 async function init() {
+  applyStaticI18n();
   await loadCountries();
 
   const { settings } = await browser.storage.local.get("settings");
@@ -95,9 +96,6 @@ save.onclick = async () => {
   await browser.runtime.sendMessage({ type: "UPDATE" });
   window.close();
 };
-const nextName = document.getElementById("next-name");
-const nextTime = document.getElementById("next-time");
-const remaining = document.getElementById("remaining");
 
 function toDate(time, offset = 0) {
   const [h, m] = time.split(":").map(Number);
@@ -105,46 +103,6 @@ function toDate(time, offset = 0) {
   d.setDate(d.getDate() + offset);
   d.setHours(h, m, 0, 0);
   return d;
-}
-
-function formatRemaining(ms) {
-  const totalMinutes = Math.ceil(ms / 60000);
-  const h = Math.floor(totalMinutes / 60);
-  const m = totalMinutes % 60;
-
-  if (h > 0 && m > 0) return `${h} saat ${m} dk`;
-  if (h > 0) return `${h} saat`;
-  return `${m} dk`;
-}
-
-
-async function loadNextVakit() {
-  const { vakitler } = await browser.storage.local.get("vakitler");
-  if (!vakitler || !vakitler.length) return;
-
-  const now = new Date();
-  let next = null;
-  let nextDate = null;
-
-  for (let i = 0; i < vakitler.length; i++) {
-    const d = toDate(vakitler[i].time);
-    if (now < d) {
-      next = vakitler[i];
-      nextDate = d;
-      break;
-    }
-  }
-
-  if (!next) {
-    next = vakitler[0];
-    nextDate = toDate(next.time, 1);
-  }
-
-  const diff = nextDate - now;
-
-  nextName.textContent = `Sonraki vakit: ${next.name}`;
-  nextTime.textContent = `Saat: ${next.time}`;
-  remaining.textContent = `Kalan süre: ${formatRemaining(diff)}`;
 }
 
 function drawBigIcon(progress, minutes) {
@@ -170,6 +128,7 @@ function drawBigIcon(progress, minutes) {
   ctx.textBaseline = "middle";
   ctx.fillText(minutes, 48, 48);
 }
+
 function getNextVakit(vakitler) {
   const now = new Date();
 
@@ -183,7 +142,6 @@ function getNextVakit(vakitler) {
     }
   }
 
-  // Yatsı geçtiyse yarının ilk vakti
   const first = vakitler[0];
   const [h, m] = first.time.split(":").map(Number);
   const d = new Date();
@@ -193,30 +151,24 @@ function getNextVakit(vakitler) {
   return { ...first, date: d };
 }
 
-function formatRemaining(ms) {
-  const totalMin = Math.floor(ms / 60000);
-  const h = Math.floor(totalMin / 60);
-  const m = totalMin % 60;
-  return h > 0 ? `${h} saat ${m} dk` : `${m} dk`;
-}
 async function loadNext() {
   const response = await browser.runtime.sendMessage({ type: "GET_VAKITLER" });
   if (!response?.vakitler?.length) return;
 
   const { vakitler, progress } = response;
   const next = getNextVakit(vakitler);
-
-  document.getElementById("next-name").textContent = next.name;
-  document.getElementById("next-time").textContent = next.time;
-
+  const prayerName = getPrayerName(next.name);
   const remainingMs = next.date - new Date();
+
+  document.getElementById("next-name").textContent =
+    browser.i18n.getMessage("nextPrayerLabel", [prayerName]);
+  document.getElementById("next-time").textContent =
+    browser.i18n.getMessage("timeLabel", [next.time]);
   document.getElementById("remaining").textContent =
-    formatRemaining(remainingMs);
+    browser.i18n.getMessage("remainingLabel", [formatDuration(remainingMs)]);
 
   const minutes = Math.ceil(remainingMs / 60000);
   drawBigIcon(progress, minutes);
 }
 
-loadNext();
-loadNextVakit();
-init();
+init().then(loadNext);
