@@ -6,6 +6,8 @@ Eklenti, arka planda sürekli çalışır ve dakika bazında otomatik olarak gü
 
 English documentation: [README.en.md](README.en.md)
 
+Zen CSS modu: [zen-theme/README.md](zen-theme/README.md)
+
 ---
 
 ## 📸 Ekran Görüntüleri

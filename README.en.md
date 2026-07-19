@@ -4,6 +4,8 @@
 
 The extension runs in the background and updates every minute.
 
+Zen CSS mod: [zen-theme/README.md](zen-theme/README.md)
+
 ---
 
 ## Screenshots
