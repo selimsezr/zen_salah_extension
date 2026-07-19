@@ -8,6 +8,14 @@ English documentation: [README.en.md](README.en.md)
 
 ---
 
+## 📸 Ekran Görüntüleri
+
+| Açık tema | Koyu tema | Vakitler ve konum seçimi |
+|:---:|:---:|:---:|
+| <img src="screenshots/popup-light.png" alt="Açık temada Vakit Takibi popup ekranı" width="240"> | <img src="screenshots/popup-dark.png" alt="Koyu temada Vakit Takibi popup ekranı" width="240"> | <img src="screenshots/prayer-times-and-location.png" alt="Namaz vakitleri ve konum seçimi ekranı" width="240"> |
+
+---
+
 ## ✨ Özellikler
 
 - ⏳ Bir sonraki namaz vaktine kalan süreyi anlık takip

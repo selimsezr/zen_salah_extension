@@ -6,6 +6,14 @@ The extension runs in the background and updates every minute.
 
 ---
 
+## Screenshots
+
+| Light theme | Dark theme | Prayer times and location |
+|:---:|:---:|:---:|
+| <img src="screenshots/popup-light.png" alt="Prayer Times popup in light theme" width="240"> | <img src="screenshots/popup-dark.png" alt="Prayer Times popup in dark theme" width="240"> | <img src="screenshots/prayer-times-and-location.png" alt="Prayer times and location selection" width="240"> |
+
+---
+
 ## Features
 
 - Countdown to the next prayer time
